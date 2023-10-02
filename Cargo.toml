@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
-gtk = { version = "0.7.3", package = "gtk4", features = ["v4_12"] }
 input = "0.8.3"
+sdl2 = "0.35.2"
