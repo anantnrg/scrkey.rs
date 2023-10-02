@@ -6,3 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+gtk = { version = "0.7.3", package = "gtk4", features = ["v4_12"] }
+input = "0.8.3"
