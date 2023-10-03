@@ -3,6 +3,7 @@ use gio::prelude::*;
 use gtk::{
 	prelude::*,
 	Application,
+	ApplicationWindow,
 	Window,
 };
 
@@ -17,9 +18,17 @@ impl Scrkey {
 		Scrkey { app }
 	}
 
-	pub fn run(app: Application) -> Result<()> {
-		app.run();
+	pub fn run(&self) -> Result<()> {
+		self.app.connect_activate(|app| Self::render(app));
+
+		self.app.run();
 
 		Ok(())
+	}
+
+	pub fn render(app: &Application) {
+		let window = ApplicationWindow::builder().application(app).title("ScrKey.rs").build();
+
+		window.present();
 	}
 }

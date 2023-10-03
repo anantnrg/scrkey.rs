@@ -7,5 +7,5 @@ use libs::gui::window::Scrkey;
 
 fn main() {
 	let scrkey = Scrkey::new("org.scrkey.ScrKey");
-	Scrkey::run(scrkey.app).unwrap();
+	Scrkey::run(&scrkey).unwrap();
 }
