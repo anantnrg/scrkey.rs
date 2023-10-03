@@ -1,10 +1,8 @@
+extern crate sdl2;
 mod libs;
 
-use anyhow::Result;
-use libs::gui::window::create_window;
+use libs::gui::window::Scrkey;
 
-const APP_ID: &str = "scrkey";
-
-fn main() -> Result<()> {
-	Ok(())
+pub fn main() {
+	Scrkey::run().unwrap();
 }
