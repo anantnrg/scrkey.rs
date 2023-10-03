@@ -5,4 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
+gdk = "0.18.0"
+gio = "0.18.2"
+gtk = { version = "0.7.3", package = "gtk4", features = ["v4_12"] }
 input = "0.8.3"

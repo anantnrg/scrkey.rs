@@ -2,14 +2,24 @@ use anyhow::Result;
 use gio::prelude::*;
 use gtk::{
 	prelude::*,
+	Application,
 	Window,
-	WindowType,
 };
 
-pub struct Scrkey {}
+pub struct Scrkey {
+	pub app: Application,
+}
 
 impl Scrkey {
-	pub fn run() -> Result<()> {
+	pub fn new(app_id: &str) -> Scrkey {
+		let app = Application::builder().application_id(app_id).build();
+
+		Scrkey { app }
+	}
+
+	pub fn run(app: Application) -> Result<()> {
+		app.run();
+
 		Ok(())
 	}
 }
