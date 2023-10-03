@@ -13,7 +13,7 @@ impl Scrkey {
 		let video = context.video().unwrap();
 
 		let window = video.window("ScrKey", 400, 60).borderless().position(50, 50).build().unwrap();
-		let mut canvas = window.into_canvas().build().unwrap();
+		let mut canvas = window.into_canvas().present_vsync().build().unwrap();
 
 		canvas.set_draw_color(Color::RGB(0, 0, 0));
 		canvas.clear();
