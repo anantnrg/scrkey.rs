@@ -27,7 +27,18 @@ impl Scrkey {
 	}
 
 	pub fn render(app: &Application) {
-		let window = ApplicationWindow::builder().application(app).title("ScrKey.rs").build();
+		let window = ApplicationWindow::builder()
+			.application(app)
+			.title("ScrKey.rs")
+			.width_request(400)
+			.height_request(60)
+			.opacity(0.0)
+			.build();
+
+		window.set_keep_above(true);
+		window.set_decorated(false);
+		window.set_resizable(false);
+		window.stick();
 
 		window.present();
 	}
