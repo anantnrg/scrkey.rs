@@ -32,7 +32,6 @@ impl Scrkey {
 			.title("ScrKey.rs")
 			.width_request(400)
 			.height_request(60)
-			.opacity(0.0)
 			.build();
 
 		window.set_keep_above(true);
