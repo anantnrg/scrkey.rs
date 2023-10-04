@@ -1,22 +1,8 @@
 use anyhow::Result;
 use gdk::prelude::*;
-use gio::prelude::*;
 use gtk::{
 	prelude::*,
 	Application,
-	ApplicationWindow,
-};
-use x11rb::{
-	self,
-	connection::Connection,
-	protocol::xproto::{
-		ConnectionExt,
-		*,
-	},
-	rust_connection::{
-		DefaultStream,
-		RustConnection,
-	},
 };
 
 pub struct Scrkey {
