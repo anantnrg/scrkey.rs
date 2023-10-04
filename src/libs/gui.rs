@@ -5,13 +5,17 @@ use gtk::{
 	Application,
 };
 
+use crate::libs::config::parse_config;
+
 pub struct Scrkey {
 	pub app: Application,
+	// pub config: Config,
 }
 
 impl Scrkey {
 	pub fn new(app_id: &str) -> Scrkey {
 		let app = Application::builder().application_id(app_id).build();
+		parse_config();
 
 		Scrkey { app }
 	}
