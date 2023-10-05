@@ -1,21 +1,28 @@
+use crate::libs::config::{
+	parse_config,
+	Config,
+};
 use anyhow::Result;
 use gdk::prelude::*;
 use gtk::{
 	prelude::*,
 	Application,
 };
-
-use crate::libs::config::parse_config;
+use std::{
+	io::{
+		self,
+		Read,
+	},
+	process::Command,
+};
 
 pub struct Scrkey {
 	pub app: Application,
-	// pub config: Config,
 }
 
 impl Scrkey {
 	pub fn new(app_id: &str) -> Scrkey {
 		let app = Application::builder().application_id(app_id).build();
-		parse_config();
 
 		Scrkey { app }
 	}
@@ -29,18 +36,79 @@ impl Scrkey {
 	}
 
 	pub fn render(app: &Application) {
+		let config = parse_config();
 		let window = gtk::Window::new(gtk::WindowType::Popup);
+		let position = Self::get_position(&config);
 
 		window.set_keep_above(true);
 		window.set_decorated(false);
 		window.set_resizable(false);
-		window.move_(50, 50);
-		window.set_width_request(400);
-		window.set_height_request(60);
+		window.move_(position.0, position.1);
+		window.set_width_request(config.size.width as i32);
+		window.set_height_request(config.size.height as i32);
 		window.set_application(Some(app));
-		window.set_title("ScrKey.rs");
+		window.set_title(config.general.title.as_str());
 		window.stick();
-
 		window.present();
+	}
+
+	pub fn get_display_size() -> (i32, i32) {
+		let xwininfo_output = Command::new("xwininfo")
+			.arg("-root")
+			.stdout(std::process::Stdio::piped())
+			.spawn()
+			.unwrap();
+
+		let grep_output = Command::new("grep")
+			.args(&["-oP", r#"\-geometry \K[^+]+"#])
+			.stdin(xwininfo_output.stdout.unwrap())
+			.output()
+			.unwrap();
+
+		let output = String::from_utf8_lossy(&grep_output.stdout);
+		let raw_dimensions: Vec<&str> = output.trim().split("x").collect();
+
+		if raw_dimensions.len() == 2 {
+			if let (Ok(width), Ok(height)) =
+				(raw_dimensions[0].parse::<i32>(), raw_dimensions[1].parse::<i32>())
+			{
+				let dimensions = (width, height);
+				return dimensions;
+			} else {
+				return (1920, 1080);
+			}
+		} else {
+			return (1920, 1080);
+		}
+	}
+
+	pub fn get_position(config: &Config) -> (i32, i32) {
+		let display_size = Self::get_display_size();
+
+		match config.position.anchor.as_str() {
+			"top left" | "left top" => return (config.position.x as i32, config.position.y as i32),
+			"top right" | "right top" => {
+				return (
+					(display_size.0 - (config.position.x + config.size.width) as i32),
+					config.position.y as i32,
+				)
+			}
+			"bottom left" | "left bottom" => {
+				return (
+					config.position.x as i32,
+					(display_size.1 - (config.position.y + config.size.height) as i32),
+				)
+			}
+			"bottom right" | "right bottom" => {
+				return (
+					(display_size.0 - (config.position.x + config.size.width) as i32),
+					(display_size.1 - (config.position.y + config.size.height) as i32),
+				)
+			}
+			&_ => {
+				eprintln!("Unknown anchor.");
+				return (0, 0);
+			}
+		}
 	}
 }

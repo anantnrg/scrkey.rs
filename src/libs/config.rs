@@ -9,6 +9,8 @@ pub struct GeneralConfig {
 	pub style: String,
 	#[default(true)]
 	pub highlight_mods: bool,
+	#[default("ScrKey.rs")]
+	pub title: String,
 }
 
 #[derive(Debug, SmartDefault, Deserialize)]
