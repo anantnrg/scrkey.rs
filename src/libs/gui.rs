@@ -49,7 +49,7 @@ impl Scrkey {
 		window.set_application(Some(app));
 		window.set_title(config.general.title.as_str());
 		window.stick();
-		window.present();
+		window.show_all();
 	}
 
 	pub fn get_display_size() -> (i32, i32) {
