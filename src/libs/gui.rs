@@ -52,6 +52,8 @@ impl Scrkey {
 	}
 
 	pub fn render(app: &Application) {
+		gtk::init().unwrap();
+
 		let config = parse_config();
 		let window = gtk::Window::new(gtk::WindowType::Popup);
 		let position = Self::get_position(&config);
