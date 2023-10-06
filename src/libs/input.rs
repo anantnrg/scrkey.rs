@@ -56,13 +56,18 @@ pub fn new() -> Libinput {
 }
 
 pub fn detect_keypress(mut input: Libinput) {
-    input.dispatch().unwrap();
+	input.dispatch().unwrap();
 
-    let keys: Vec<&str> = vec![];
+	let mut keys = Vec::new();
 
-    for event in input.clone().into_iter() {
-        if let Event::Keyboard(Key(event)) = event {
-
-        }
-    }
+	for event in input.clone().into_iter() {
+		if let Event::Keyboard(Key(event)) = event {
+			if event.key_state() == KeyState::Pressed {
+				keys.push(event.key());
+			}
+			if event.key_state() == KeyState::Released {
+				println!("{:?}", keys);
+			}
+		}
+	}
 }

@@ -1,6 +1,9 @@
-use crate::libs::config::{
-	parse_config,
-	Config,
+use crate::libs::{
+	config::{
+		parse_config,
+		Config,
+	},
+	input,
 };
 use anyhow::Result;
 use gdk::prelude::*;
@@ -50,6 +53,11 @@ impl Scrkey {
 		window.set_title(config.general.title.as_str());
 		window.stick();
 		window.show_all();
+
+		let input = input::new();
+		loop {
+			input::detect_keypress(input.clone());
+		}
 	}
 
 	pub fn get_display_size() -> (i32, i32) {
