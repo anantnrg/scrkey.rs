@@ -52,11 +52,21 @@ impl Scrkey {
 		window.set_application(Some(app));
 		window.set_title(config.general.title.as_str());
 		window.stick();
-		window.show_all();
+
+		let input_label = gtk::Label::new(Some("hello world"));
+		input_label.set_text("Hello");
+
+		let vbox = gtk::Box::new(gtk::Orientation::Horizontal, 0);
+		vbox.pack_start(&input_label, false, false, 0);
+
+		window.add(&vbox);
 
 		let input = input::new();
+
+		let mut keys = Vec::new();
+
 		loop {
-			input::detect_keypress(input.clone());
+			input.dispatch().unwrap();
 		}
 	}
 

@@ -55,19 +55,41 @@ pub fn new() -> Libinput {
 	return input;
 }
 
-pub fn detect_keypress(mut input: Libinput) {
+pub fn detect_keypress(mut input: Libinput, mut keys: Vec<String>) -> Option<Vec<String>> {
 	input.dispatch().unwrap();
 
-	let mut keys = Vec::new();
-
-	for event in input.clone().into_iter() {
+	let key_events = input.clone().into_iter().filter_map(|event| {
 		if let Event::Keyboard(Key(event)) = event {
-			if event.key_state() == KeyState::Pressed {
-				keys.push(event.key());
-			}
-			if event.key_state() == KeyState::Released {
-				println!("{:?}", keys);
-			}
+			Some((event.key_state(), event.key().to_string()))
+		} else {
+			None
 		}
+	});
+
+	let pressed_keys: Vec<String> = key_events
+		.clone()
+		.filter(|(key_state, _)| *key_state == KeyState::Pressed)
+		.map(|(_, key)| key)
+		.collect();
+
+	if !pressed_keys.is_empty() {
+		println!("pressed");
+		keys.extend(pressed_keys);
+	}
+
+	let released_keys: Vec<String> = key_events
+		.filter(|(key_state, _)| *key_state == KeyState::Released)
+		.map(|(_, key)| key)
+		.collect();
+
+	if !released_keys.is_empty() {
+		println!("released");
+		return Some(keys);
+	}
+
+	if !keys.is_empty() {
+		Some(keys) // Return the list of all pressed keys
+	} else {
+		None
 	}
 }
