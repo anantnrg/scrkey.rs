@@ -16,19 +16,15 @@ use libc::{
 	O_WRONLY,
 };
 use std::{
-	env::var,
-	error::Error,
 	fs::{
 		File,
 		OpenOptions,
 	},
-	io::stdout,
 	os::unix::{
 		fs::OpenOptionsExt,
 		io::OwnedFd,
 	},
 	path::Path,
-	process::Command,
 };
 
 pub struct Interface;

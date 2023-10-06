@@ -3,13 +3,25 @@ use crate::libs::{
 		parse_config,
 		Config,
 	},
-	input,
+	get_input,
 };
 use anyhow::Result;
 use gdk::prelude::*;
 use gtk::{
 	prelude::*,
 	Application,
+};
+use input::{
+	event::{
+		keyboard::{
+			KeyState,
+			KeyboardEventTrait,
+		},
+		KeyboardEvent::Key,
+	},
+	Event,
+	Libinput,
+	LibinputInterface,
 };
 use std::{
 	io::{
@@ -18,6 +30,7 @@ use std::{
 	},
 	process::Command,
 };
+use tokio::runtime;
 
 pub struct Scrkey {
 	pub app: Application,
@@ -54,23 +67,46 @@ impl Scrkey {
 		window.stick();
 
 		let input_label = gtk::Label::new(Some("hello world"));
-		input_label.set_text("Hello");
 
 		let vbox = gtk::Box::new(gtk::Orientation::Horizontal, 0);
 		vbox.pack_start(&input_label, false, false, 0);
 
 		window.add(&vbox);
 
-		let input = input::new();
+		let input = get_input::new();
 
-		// let mut keys = Vec::new();
+		let input_label_clone = input_label.clone();
 
-		loop {
-			input.clone().dispatch().unwrap();
-			for event in input.clone().into_iter() {
-				println!("{:?}", event);
+		let rt = runtime::Builder::new_multi_thread()
+			.worker_threads(2) // Adjust the number of worker threads as needed
+			.enable_all()
+			.build()
+			.unwrap();
+
+		rt.block_on(async {
+			let mut keys = Vec::new();
+			loop {
+				input.clone().dispatch().unwrap();
+				for event in input.clone().into_iter() {
+					if let Event::Keyboard(Key(event)) = event {
+						if event.key_state() == KeyState::Pressed {
+							keys.push(event.key());
+						}
+						if event.key_state() == KeyState::Released {
+							println!("{:?}", keys);
+							input_label_clone.set_text(format!("{:?}", keys).as_str());
+							if !keys.is_empty() {
+								keys.clear();
+							}
+						}
+					}
+				}
+				tokio::time::sleep(std::time::Duration::from_millis(10)).await;
 			}
-		}
+		});
+
+		window.show_all();
+		gtk::main();
 	}
 
 	pub fn get_display_size() -> (i32, i32) {
