@@ -47,3 +47,22 @@ impl LibinputInterface for Interface {
 		drop(File::from(fd));
 	}
 }
+
+pub fn new() -> Libinput {
+	let mut input = Libinput::new_with_udev(Interface);
+	input.udev_assign_seat("seat0").unwrap();
+
+	return input;
+}
+
+pub fn detect_keypress(mut input: Libinput) {
+    input.dispatch().unwrap();
+
+    let keys: Vec<&str> = vec![];
+
+    for event in input.clone().into_iter() {
+        if let Event::Keyboard(Key(event)) = event {
+
+        }
+    }
+}
