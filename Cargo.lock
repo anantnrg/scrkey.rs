@@ -581,6 +581,7 @@ dependencies = [
  "gio",
  "gtk",
  "input",
+ "libc",
  "serde",
  "serde_derive",
  "smart-default",
