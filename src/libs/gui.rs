@@ -63,10 +63,13 @@ impl Scrkey {
 
 		let input = input::new();
 
-		let mut keys = Vec::new();
+		// let mut keys = Vec::new();
 
 		loop {
-			input.dispatch().unwrap();
+			input.clone().dispatch().unwrap();
+			for event in input.clone().into_iter() {
+				println!("{:?}", event);
+			}
 		}
 	}
 
