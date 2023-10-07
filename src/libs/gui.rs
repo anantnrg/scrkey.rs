@@ -83,23 +83,21 @@ impl Scrkey {
 
 		let mut keys = Vec::new();
 
-		spawn(|| {
-			input.lock().unwrap().clone().dispatch().unwrap();
-			for event in input.lock().unwrap().clone().into_iter() {
-				if let Event::Keyboard(Key(event)) = event {
-					if event.key_state() == KeyState::Pressed {
-						keys.push(event.key());
-					}
-					if event.key_state() == KeyState::Released {
-						println!("{:?}", keys);
-						input_label_clone.lock().unwrap().set_text(format!("{:?}", keys).as_str());
-						if !keys.is_empty() {
-							keys.clear();
-						}
+		input.lock().unwrap().clone().dispatch().unwrap();
+		for event in input.lock().unwrap().clone().into_iter() {
+			if let Event::Keyboard(Key(event)) = event {
+				if event.key_state() == KeyState::Pressed {
+					keys.push(event.key());
+				}
+				if event.key_state() == KeyState::Released {
+					println!("{:?}", keys);
+					input_label_clone.lock().unwrap().set_text(format!("{:?}", keys).as_str());
+					if !keys.is_empty() {
+						keys.clear();
 					}
 				}
 			}
-		});
+		}
 
 		window.show_all();
 	}
