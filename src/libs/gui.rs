@@ -77,34 +77,29 @@ impl Scrkey {
 
 		window.add(&vbox);
 
-		let input = Arc::new(Mutex::new(get_input::new()));
+		let input = get_input::new();
 
 		let input_label_clone = input_label.clone();
-		let window_clone = Arc::new(Mutex::new(window));
 
-		tokio::spawn(async move {
-			let mut keys = Vec::new();
-			loop {
-				window_clone.lock().unwrap().show_all();
+		let mut keys = Vec::new();
 
-				input.lock().unwrap().clone().dispatch().unwrap();
-				for event in input.lock().unwrap().clone().into_iter() {
-					if let Event::Keyboard(Key(event)) = event {
-						if event.key_state() == KeyState::Pressed {
-							keys.push(event.key());
-						}
-						if event.key_state() == KeyState::Released {
-							println!("{:?}", keys);
-							input_label_clone.set_text(format!("{:?}", keys).as_str());
-							if !keys.is_empty() {
-								keys.clear();
-							}
-						}
+		input.clone().dispatch().unwrap();
+		for event in input.clone().into_iter() {
+			if let Event::Keyboard(Key(event)) = event {
+				if event.key_state() == KeyState::Pressed {
+					keys.push(event.key());
+				}
+				if event.key_state() == KeyState::Released {
+					println!("{:?}", keys);
+					input_label_clone.set_text(format!("{:?}", keys).as_str());
+					if !keys.is_empty() {
+						keys.clear();
 					}
 				}
-				tokio::time::sleep(std::time::Duration::from_millis(10)).await;
 			}
-		});
+		}
+
+		window.show_all();
 	}
 
 	pub fn get_display_size() -> (i32, i32) {
