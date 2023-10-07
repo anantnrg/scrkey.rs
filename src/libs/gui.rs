@@ -33,8 +33,8 @@ use std::{
 		Arc,
 		Mutex,
 	},
+	thread::spawn,
 };
-use tokio::runtime;
 
 pub struct Scrkey {
 	pub app: Application,
@@ -77,27 +77,29 @@ impl Scrkey {
 
 		window.add(&vbox);
 
-		let input = get_input::new();
+		let input = Arc::new(Mutex::new(get_input::new()));
 
-		let input_label_clone = input_label.clone();
+		let input_label_clone = Arc::new(Mutex::new(input_label.clone()));
 
 		let mut keys = Vec::new();
 
-		input.clone().dispatch().unwrap();
-		for event in input.clone().into_iter() {
-			if let Event::Keyboard(Key(event)) = event {
-				if event.key_state() == KeyState::Pressed {
-					keys.push(event.key());
-				}
-				if event.key_state() == KeyState::Released {
-					println!("{:?}", keys);
-					input_label_clone.set_text(format!("{:?}", keys).as_str());
-					if !keys.is_empty() {
-						keys.clear();
+		spawn(|| {
+			input.lock().unwrap().clone().dispatch().unwrap();
+			for event in input.lock().unwrap().clone().into_iter() {
+				if let Event::Keyboard(Key(event)) = event {
+					if event.key_state() == KeyState::Pressed {
+						keys.push(event.key());
+					}
+					if event.key_state() == KeyState::Released {
+						println!("{:?}", keys);
+						input_label_clone.lock().unwrap().set_text(format!("{:?}", keys).as_str());
+						if !keys.is_empty() {
+							keys.clear();
+						}
 					}
 				}
 			}
-		}
+		});
 
 		window.show_all();
 	}
