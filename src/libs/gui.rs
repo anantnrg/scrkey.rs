@@ -33,7 +33,7 @@ use std::{
 		Arc,
 		Mutex,
 	},
-	thread::spawn,
+	thread::{spawn, self},
 };
 
 pub struct Scrkey {
@@ -77,27 +77,11 @@ impl Scrkey {
 
 		window.add(&vbox);
 
-		let input = Arc::new(Mutex::new(get_input::new()));
-
-		let input_label_clone = Arc::new(Mutex::new(input_label.clone()));
-
-		let mut keys = Vec::new();
-
-		input.lock().unwrap().clone().dispatch().unwrap();
-		for event in input.lock().unwrap().clone().into_iter() {
-			if let Event::Keyboard(Key(event)) = event {
-				if event.key_state() == KeyState::Pressed {
-					keys.push(event.key());
-				}
-				if event.key_state() == KeyState::Released {
-					println!("{:?}", keys);
-					input_label_clone.lock().unwrap().set_text(format!("{:?}", keys).as_str());
-					if !keys.is_empty() {
-						keys.clear();
-					}
-				}
+		thread::spawn(move || {
+			loop {
+				println!("hello");
 			}
-		}
+		});
 
 		window.show_all();
 	}
